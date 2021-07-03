@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import { userContext } from '../App';
 
 import Header from '../partials/Header';
 
 function SignIn() {
+  const [loggedInUser, setLoggedInUser] = useContext(userContext);
   const history = useHistory();
+  const [message, setMessage] = useState("");
   const [user, setUser] = useState({
     email: '',
     password: ''
@@ -31,7 +34,10 @@ function SignIn() {
     .then(res => res.json())
     .then(data => {
       if(data) {
+        setLoggedInUser({email: user.email});
         history.push('/dashboard');
+      } else {
+        setMessage('Email or Password is Incorrect!');
       }
     })
   }
@@ -53,6 +59,8 @@ function SignIn() {
               <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
                 <h1 className="h1">Welcome back. We exist to make entrepreneurism easier.</h1>
               </div>
+
+              <div className="text-red-500 text-center">{message}</div>
 
               {/* Form */}
               <div className="max-w-sm mx-auto">
