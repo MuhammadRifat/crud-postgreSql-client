@@ -1,9 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import Header from '../partials/Header';
 
 function SignUp() {
+  const [message, setMessage] = useState(false);
+  const [user, setUser] = useState({
+    email: '',
+    name: '',
+    dob: '',
+    profession: '',
+    password: ''
+  });
+
+  // For capturing user data
+  const handleBlur = (e) => {
+    const newUser = {...user};
+    newUser[e.target.name] = e.target.value;
+    setUser(newUser);
+  }
+
+  // handle sign up button
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetch("http://localhost:5000/addUser", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+    },
+      body: JSON.stringify(user)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data) {
+        setMessage(data);
+      }
+    })
+  }
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
 
@@ -22,42 +56,47 @@ function SignUp() {
                 <h1 className="h1">Welcome. We exist to make entrepreneurism easier.</h1>
               </div>
 
+              <div className="text-center">
+                {
+                  message && <span className="text-green-500">Sign up successful</span>
+                }
+              </div>
               {/* Form */}
               <div className="max-w-sm mx-auto">
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="name">Name <span className="text-red-600">*</span></label>
-                      <input id="name" name="name" type="text" className="form-input w-full text-gray-800" placeholder="Enter your name" required />
+                      <input id="name" name="name" onBlur={handleBlur} type="text" className="form-input w-full text-gray-800" placeholder="Enter your name" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">Email <span className="text-red-600">*</span></label>
-                      <input id="email" name="email" type="email" className="form-input w-full text-gray-800" placeholder="Enter your email address" required />
+                      <input id="email" name="email" onBlur={handleBlur} type="email" className="form-input w-full text-gray-800" placeholder="Enter your email address" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="dob">Date of Birth <span className="text-red-600">*</span></label>
-                      <input id="dob" name="dob" type="date" className="form-input w-full text-gray-800" placeholder="Enter date of birth" required />
+                      <input id="dob" name="dob" onBlur={handleBlur} type="date" className="form-input w-full text-gray-800" placeholder="Enter date of birth" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="profession">Profession <span className="text-red-600">*</span></label>
-                      <input id="profession" name="profession" type="text" className="form-input w-full text-gray-800" placeholder="Enter your profession" required />
+                      <input id="profession" onBlur={handleBlur} name="profession" type="text" className="form-input w-full text-gray-800" placeholder="Enter your profession" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="password">Password <span className="text-red-600">*</span></label>
-                      <input id="password" name="password" type="password" className="form-input w-full text-gray-800" placeholder="Enter your password" required />
+                      <input id="password" name="password" onBlur={handleBlur} type="password" className="form-input w-full text-gray-800" placeholder="Enter your password" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
-                      <button className="btn text-white bg-blue-600 hover:bg-blue-700 w-full">Sign up</button>
+                      <button type="submit" className="btn text-white bg-blue-600 hover:bg-blue-700 w-full">Sign up</button>
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 text-center mt-3">
