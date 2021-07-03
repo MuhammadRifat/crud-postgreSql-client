@@ -1,9 +1,47 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { userContext } from '../App';
 
 import Header from '../partials/Header';
 
 function SignIn() {
+  const [loggedInUser, setLoggedInUser] = useContext(userContext);
+  const history = useHistory();
+  const [message, setMessage] = useState("");
+  const [user, setUser] = useState({
+    email: '',
+    password: ''
+  })
+
+  // For capturing sign in data
+  const handleBlur = (e) => {
+    const newUser = {...user};
+    newUser[e.target.name] = e.target.value;
+    setUser(newUser);
+  }
+
+  // handle sign in button
+  const handleSignIn = (e) => {
+    e.preventDefault();
+
+    fetch("http://localhost:5000/signIn", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data) {
+        setLoggedInUser({email: user.email});
+        history.push('/dashboard');
+      } else {
+        setMessage('Email or Password is Incorrect!');
+      }
+    })
+  }
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
 
@@ -22,13 +60,15 @@ function SignIn() {
                 <h1 className="h1">Welcome back. We exist to make entrepreneurism easier.</h1>
               </div>
 
+              <div className="text-red-500 text-center">{message}</div>
+
               {/* Form */}
               <div className="max-w-sm mx-auto">
-                <form>
+                <form onSubmit={handleSignIn}>
                   <div className="flex flex-wrap -mx-3 mb-4">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">Email</label>
-                      <input id="email" type="email" className="form-input w-full text-gray-800" placeholder="Enter your email address" required />
+                      <input id="email" name="email" onBlur={handleBlur} type="email" className="form-input w-full text-gray-800" placeholder="Enter your email address" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
@@ -37,7 +77,7 @@ function SignIn() {
                         <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="password">Password</label>
                         <Link to="reset-password" className="text-sm font-medium text-blue-600 hover:underline">Having trouble signing in?</Link>
                       </div>
-                      <input id="password" type="password" className="form-input w-full text-gray-800" placeholder="Enter your password" required />
+                      <input id="password" name="password" onBlur={handleBlur} type="password" className="form-input w-full text-gray-800" placeholder="Enter your password" required />
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-4">
@@ -52,7 +92,7 @@ function SignIn() {
                   </div>
                   <div className="flex flex-wrap -mx-3 mt-6">
                     <div className="w-full px-3">
-                      <button className="btn text-white bg-blue-600 hover:bg-blue-700 w-full">Sign in</button>
+                      <button type="submit" className="btn text-white bg-blue-600 hover:bg-blue-700 w-full">Sign in</button>
                     </div>
                   </div>
                 </form>

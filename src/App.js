@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import {
   Switch,
   Route,
@@ -15,9 +15,12 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
+import PrivateRoute from './utils/PrivateRoute';
+
+export const userContext = createContext();
 
 function App() {
-
+  const [LoggedInUser, setLoggedInUser] = useState({});
   const location = useLocation();
 
   useEffect(() => {
@@ -37,7 +40,7 @@ function App() {
   }, [location.pathname]); // triggered on route change
 
   return (
-    <>
+    <userContext.Provider value={[LoggedInUser, setLoggedInUser]}>
       <Switch>
         <Route exact path="/">
           <Home />
@@ -48,6 +51,9 @@ function App() {
         <Route path="/signup">
           <SignUp />
         </Route>
+        <PrivateRoute path="/dashboard">
+          <Dashboard />
+        </PrivateRoute>
         <Route path="/reset-password">
           <ResetPassword />
         </Route>
@@ -55,7 +61,7 @@ function App() {
           <Dashboard />
         </Route>
       </Switch>
-    </>
+    </userContext.Provider>
   );
 }
 
